@@ -1,3 +1,4 @@
+#%%
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -18,16 +19,18 @@ with urlopen('https://france-geojson.gregoiredavid.fr/repo/departements.geojson'
     counties = json.load(response) # load map in json format
 
 sheets_dict = pd.read_excel('data/metrics.xlsx', sheet_name=None)
-df_data = {}
+data_dict = {}
 metrics_dropdown = []
 i = 0
 for name, sheet in sheets_dict.items():
     sheet['sheet'] = name
-    df_data[name] = sheet
+    data_dict[name] = sheet
     metrics_dropdown.append({'label':name, 'value':i})
     i+=1
 
-fig_map = px.choropleth(df_data['taux_hosp'], geojson=counties, color="2020-03-18",
+#%%
+
+fig_map = px.choropleth(data_dict['taux_hosp'], geojson=counties, color="2020-03-18",
                     locations="dep", featureidkey="properties.code",
                     projection="mercator", labels={'02/01/2020':'saturation'}
                    )
@@ -36,21 +39,21 @@ fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, height=850)
 
 # ----------- TRENDLINE -----------
 
-fig_trend = px.line(df_data['taux_hosp'], x=df_data['taux_hosp'].columns,
-                    y=df_data['taux_hosp'][df_data['taux_hosp']['dep']=='02'].values.flat,
+fig_trend = px.line(data_dict['taux_hosp'], x=data_dict['taux_hosp'].columns,
+                    y=data_dict['taux_hosp'][data_dict['taux_hosp']['dep']=='02'].values.flat,
                     title='Trend line')
 
 # ----------- BAR CHART -----------
 
 fig_bar = go.Figure()
-fig_bar.add_trace(go.Bar(x=df_data['taux_hosp']['dep'],
-                y=df_data['taux_hosp']["2020-03-18"],
+fig_bar.add_trace(go.Bar(x=data_dict['taux_hosp']['2020-03-25'].values,
+                y=data_dict['taux_hosp']['dep'].values,
                 name="2020-03-18",
                 marker_color='rgb(55, 83, 109)',
                 orientation='h'
                 ))
-fig_bar.add_trace(go.Bar(x=df_data['taux_hosp']['dep'],
-                y=df_data['taux_hosp']["2020-03-18"],
+fig_bar.add_trace(go.Bar(x=data_dict['taux_hosp']['2020-03-25'].values,
+                y=data_dict['taux_hosp']['dep'].values,
                 name='Availability',
                 marker_color='rgb(26, 118, 255)',
                 orientation='h'
