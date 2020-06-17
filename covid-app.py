@@ -17,11 +17,18 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 with urlopen('https://france-geojson.gregoiredavid.fr/repo/departements.geojson') as response:
     counties = json.load(response) # load map in json format
 
-df_saturation = pd.read_excel("data.xls", sheet_name="saturation",
-                              dtype={'code': str})
+sheets_dict = pd.read_excel('data/metrics.xlsx', sheet_name=None)
+df_data = {}
+metrics_dropdown = []
+i = 0
+for name, sheet in sheets_dict.items():
+    sheet['sheet'] = name
+    df_data[name] = sheet
+    metrics_dropdown.append({'label':name, 'value':i})
+    i+=1
 
-fig_map = px.choropleth(df_saturation, geojson=counties, color="02/01/2020",
-                    locations="code", featureidkey="properties.code",
+fig_map = px.choropleth(df_data['taux_hosp'], geojson=counties, color="2020-03-18",
+                    locations="dep", featureidkey="properties.code",
                     projection="mercator", labels={'02/01/2020':'saturation'}
                    )
 fig_map.update_geos(fitbounds="locations", visible=False)
@@ -29,20 +36,21 @@ fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, height=850)
 
 # ----------- TRENDLINE -----------
 
-df_trend = pd.read_csv("graph_values.csv")
-fig_trend = px.line(df_trend, x="day", y="value", title='Trend line')
+fig_trend = px.line(df_data['taux_hosp'], x=df_data['taux_hosp'].columns,
+                    y=df_data['taux_hosp'][df_data['taux_hosp']['dep']=='02'].values.flat,
+                    title='Trend line')
 
 # ----------- BAR CHART -----------
 
 fig_bar = go.Figure()
-fig_bar.add_trace(go.Bar(x=df_saturation['code'],
-                y=df_saturation['02/01/2020'],
-                name='02/01/2020',
+fig_bar.add_trace(go.Bar(x=df_data['taux_hosp']['dep'],
+                y=df_data['taux_hosp']["2020-03-18"],
+                name="2020-03-18",
                 marker_color='rgb(55, 83, 109)',
                 orientation='h'
                 ))
-fig_bar.add_trace(go.Bar(x=df_saturation['code'],
-                y=df_saturation['02/01/2020'],
+fig_bar.add_trace(go.Bar(x=df_data['taux_hosp']['dep'],
+                y=df_data['taux_hosp']["2020-03-18"],
                 name='Availability',
                 marker_color='rgb(26, 118, 255)',
                 orientation='h'
@@ -103,11 +111,8 @@ app.layout = html.Div(
                     html.Div(
                 [
                     dcc.Dropdown(
-                        id='metric',
-                        options=[
-                            {'label': 'Saturation', 'value': '0'},
-                            {'label': 'Number of private hospitals', 'value': '1'},
-                            ],
+                        id='metric_1',
+                        options=metrics_dropdown,
                         style={
                             'width': '250px',
                             },
@@ -118,15 +123,12 @@ app.layout = html.Div(
                     html.Div(
                 [
                     dcc.Dropdown(
-                        id='metric-3D',
-                        options=[
-                            {'label': 'Saturation', 'value': '0'},
-                            {'label': 'Number of private hospitals', 'value': '1'},
-                            ],
+                        id='metric_2',
+                        options=metrics_dropdown,
                         style={
                             'width': '250px',
                             },
-                        value='1'
+                        value='0'
                         ),
                 ], className="three columns"),
 
