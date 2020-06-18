@@ -8,6 +8,7 @@ import json
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
+import re
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -28,7 +29,10 @@ for name, sheet in sheets_dict.items():
     metrics_dropdown.append({'label':name, 'value':i})
     i+=1
 
-#%%
+dep_dropdown = []
+dep_list = data_dict[list(data_dict.keys())[0]]['dep']
+for i, dep in enumerate(dep_list):
+    dep_dropdown.append({'label':dep, 'value': i})
 
 fig_map = px.choropleth(data_dict['taux_hosp'], geojson=counties, color="2020-03-18",
                     locations="dep", featureidkey="properties.code",
@@ -36,6 +40,14 @@ fig_map = px.choropleth(data_dict['taux_hosp'], geojson=counties, color="2020-03
                    )
 fig_map.update_geos(fitbounds="locations", visible=False)
 fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, height=850)
+
+# ---------------------------------
+
+def metricName(value):
+    for metric in metrics_dropdown:
+        if(value == metric['value']):
+            return metric['label']
+    return None
 
 # ----------- TRENDLINE -----------
 
@@ -79,6 +91,8 @@ fig_bar.update_layout(
     bargroupgap=0.1 # gap between bars of the same location coordinate.
 )
 
+#%%
+
 # ----------- DASHBOARD ARCHITECTURE -----------
 
 app.layout = html.Div(
@@ -86,6 +100,7 @@ app.layout = html.Div(
             ######## TITLE ##############"
             html.Div(
                 [
+                html.Div(id='fordebug'),
                 html.H1(
                     children='Covid-19 hospital tracker',
                     style={
@@ -100,14 +115,17 @@ app.layout = html.Div(
                 [
                     html.Div(
                 [
-                    html.Button('-', id='buttonMinus'),
+
+                    #html.Button('-', id='buttonMinus'),
 
                     dcc.DatePickerSingle(
                     id='date-picker-single',
-                    date=dt(2019, 1, 1)
-                        ),
+                    date=dt(2020, 3, 25)
+                        )
 
-                    html.Button('+', id='buttonPlus'),
+                    #,
+                    #html.Button('+', id='buttonPlus'),
+
                 ], className="three columns"),
 
                 ########## DROPDOWN METRIC 1 ##########
@@ -132,7 +150,7 @@ app.layout = html.Div(
                             'width': '250px',
                             },
                         value='0'
-                        ),
+                        )
                 ], className="three columns"),
 
                 ########## DROPDOWN DEPARTMENT ##########
@@ -140,10 +158,7 @@ app.layout = html.Div(
                 [
                     dcc.Dropdown(
                         id='departments',
-                        options=[
-                            {'label': 'Manche', 'value': '50'},
-                            {'label': 'Morbihan', 'value': '56'}
-                            ],
+                        options=dep_dropdown,
                         style={
                             'width': '250px',
                             },
@@ -162,7 +177,7 @@ app.layout = html.Div(
 
                     html.Div([
 
-                        dcc.Graph(figure=fig_map),
+                        dcc.Graph(id="map", figure=fig_map),
 
                         ], className="seven columns"),
 
@@ -183,6 +198,27 @@ app.layout = html.Div(
                         ], className="five columns")
             ], className="eleven columns")
     ])
+
+# ----------- CALLBACKS -------------------------
+
+@app.callback(
+    dash.dependencies.Output('map', 'figure'),
+    [dash.dependencies.Input('date-picker-single', 'date'),
+     dash.dependencies.Input('metric_1', 'value')])
+def update_figure(selected_date, selected_metric):
+
+    date = dt.strptime(re.split('T| ', selected_date)[0], '%Y-%m-%d')
+    date_string = date.strftime('%Y-%m-%d')
+    metric_name = metricName(int(selected_metric))
+
+    fig = px.choropleth(data_dict[metric_name], geojson=counties, color=date_string,
+                    locations="dep", featureidkey="properties.code",
+                    projection="mercator", labels={'02/01/2020':'saturation'}
+                   )
+    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, height=850)
+
+    return fig
 
 if __name__ == '__main__':
     app.run_server(debug=True)
