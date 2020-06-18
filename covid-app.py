@@ -36,7 +36,9 @@ for i, dep in enumerate(dep_list):
 
 fig_map = px.choropleth(data_dict['taux_hosp'], geojson=counties, color="2020-03-18",
                     locations="dep", featureidkey="properties.code",
-                    projection="mercator", labels={'02/01/2020':'saturation'}
+                    projection="mercator", labels={'02/01/2020':'saturation'},
+                    color_continuous_scale=[(0, "rgb(223, 30, 38)"), (0.8, "rgb(243, 114, 32)"),
+                                            (0.9, "rgb(251, 163, 26)"), (1, "rgb(255, 213, 0)")]
                    )
 fig_map.update_geos(fitbounds="locations", visible=False)
 fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, height=850)
@@ -213,7 +215,9 @@ def update_figure(selected_date, selected_metric):
 
     fig = px.choropleth(data_dict[metric_name], geojson=counties, color=date_string,
                     locations="dep", featureidkey="properties.code",
-                    projection="mercator", labels={'02/01/2020':'saturation'}
+                    projection="mercator", labels={'02/01/2020':'saturation'},
+                    color_continuous_scale=[(0, "rgb(223, 30, 38)"), (0.02, "rgb(243, 114, 32)"),
+                                            (0.9, "rgb(251, 163, 26)"), (1, "rgb(255, 213, 0)")]
                    )
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, height=850)
