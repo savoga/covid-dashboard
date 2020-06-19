@@ -1,4 +1,3 @@
-#%%%
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
@@ -13,8 +12,6 @@ import re
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
-# ----------- MAP -----------
 
 with urlopen('https://france-geojson.gregoiredavid.fr/repo/departements.geojson') as response:
     counties = json.load(response) # load map in json format
@@ -42,7 +39,11 @@ dep_list = data_dict[list(data_dict.keys())[0]]['dep']
 for i, dep in enumerate(dep_list):
     dep_dropdown.append({'label':dep, 'value': i})
 
-fig_map = px.choropleth(data_dict['taux_hosp'], geojson=counties, color="2020-03-18",
+first_DF = data_dict[next(iter(data_dict))]
+
+# ----------- MAP -----------
+
+fig_map = px.choropleth(first_DF, geojson=counties, color="2020-03-18",
                     locations="dep", featureidkey="properties.code",
                     projection="mercator", labels={'02/01/2020':'saturation'}
                    )
@@ -65,8 +66,8 @@ def departmentNumber(value):
 
 # ----------- TRENDLINE -----------
 
-fig_trend = px.line(data_dict['taux_hosp'], x=data_dict['taux_hosp'].columns[1:],
-                    y=data_dict['taux_hosp'][data_dict['taux_hosp']['dep']=='01'].values.flat[1:],
+fig_trend = px.line(first_DF, x=first_DF.columns[1:],
+                    y=first_DF[first_DF['dep']=='01'].values.flat[1:],
                     title='Trend line')
 
 # ----------- BAR CHART -----------
@@ -78,8 +79,8 @@ def Top_indices(liste,N):
 def lowest_indices(liste,N):
     return sorted(range(len(liste)), key=lambda i: liste[i], reverse=False)[:N]
 
-X0=list(data_dict['taux_hosp']['2020-03-25'].values)
-Y0=list(data_dict['taux_hosp']['dep'].values)
+X0=list(first_DF['2020-03-25'].values)
+Y0=list(first_DF['dep'].values)
 
 indices1=Top_indices(X0,10)
 
@@ -197,7 +198,7 @@ app.layout = html.Div(
                         id='metric_1',
                         options=metrics_dropdown,
                         style={
-                            'width': '250px',
+                            'width': '300px',
                             },
                         value='0'
                         )], className="three columns"),
@@ -209,7 +210,7 @@ app.layout = html.Div(
                         id='metric_2',
                         options=metrics_dropdown,
                         style={
-                            'width': '250px',
+                            'width': '300px',
                             },
                         value='0'
                         )
@@ -296,7 +297,6 @@ def update_figure(selected_date, selected_metric):
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, height=850)
 
     #####-----------------------update of chart bar1----------------------
-    print(date_string)
     X0=list(data_dict[metric_name][date_string].values)
     Y0=list(data_dict[metric_name]['dep'].values)
 
