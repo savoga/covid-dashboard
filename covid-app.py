@@ -45,7 +45,7 @@ first_DF = data_dict[next(iter(data_dict))]
 
 fig_map = px.choropleth(first_DF, geojson=counties, color="2020-03-18",
                     locations="dep", featureidkey="properties.code",
-                    projection="mercator", labels={'02/01/2020':'saturation'}
+                    projection="mercator"
                    )
 fig_map.update_geos(fitbounds="locations", visible=False)
 fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, height=850)
@@ -289,10 +289,11 @@ def update_figure(selected_date, selected_metric):
         color_continuous_scale=None
 
     fig = px.choropleth(data_dict[metric_name], geojson=counties, color=date_string,
-                    locations="dep", featureidkey="properties.code",
-                    projection="mercator", labels={'02/01/2020':'saturation'},
+                    featureidkey="properties.code", locations="dep",
+                    projection="mercator", hover_name="dep", hover_data={"dep":False, date_string:True},
                     color_continuous_scale=color_continuous_scale
                    )
+
     fig.update_geos(fitbounds="locations", visible=False)
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0}, height=850)
 
