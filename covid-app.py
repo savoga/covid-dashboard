@@ -282,7 +282,7 @@ def update_figure(selected_date, selected_metric):
     date_string = date.strftime('%Y-%m-%d')
     metric_name = metricName(int(selected_metric))
 
-    if(metric_name == 'nbre_medecins_par_cas'):
+    if(metric_name == 'Medical staff saturation'):
         color_continuous_scale=[(0, "rgb(223, 30, 38)"), (0.02, "rgb(243, 114, 32)"),
                                             (0.9, "rgb(251, 163, 26)"), (1, "rgb(255, 213, 0)")]
     else:
