@@ -178,34 +178,31 @@ app.layout = html.Div(
                 [
                     html.Div(
                 [
-
-                    #html.Button('-', id='buttonMinus'),
-
+                    html.P(['Date selection']),
                     dcc.DatePickerSingle(
                     id='date-picker-single',
                     date=dt(2020, 3, 25)
                         )
-
-                    #,
-                    #html.Button('+', id='buttonPlus'),
-
                 ], className="three columns"),
 
                 ########## DROPDOWN METRIC 1 ##########
                     html.Div(
-                [
+                        [
+                    html.Label(['Metric 1',
                     dcc.Dropdown(
                         id='metric_1',
                         options=metrics_dropdown,
                         style={
                             'width': '300px',
                             },
-                        value='0'
-                        )], className="three columns"),
+                        value='0')
+                        ])
+                    ], className="three columns"),
 
                 ########## DROPDOWN METRIC 2 ##########
                     html.Div(
                 [
+                    html.Label(['Metric 2',
                     dcc.Dropdown(
                         id='metric_2',
                         options=metrics_dropdown,
@@ -214,11 +211,13 @@ app.layout = html.Div(
                             },
                         value='0'
                         )
+                    ])
                 ], className="three columns"),
 
                 ########## DROPDOWN DEPARTMENT ##########
                     html.Div(
                 [
+                    html.Label(['Department',
                     dcc.Dropdown(
                         id='departments',
                         options=dep_dropdown,
@@ -226,8 +225,8 @@ app.layout = html.Div(
                             'width': '250px',
                             },
                         value=1
-                        ),
-                    html.Div(id='test'),
+                        )
+                        ])
                     ], className="three columns")
 
                 ]),
@@ -275,12 +274,14 @@ app.layout = html.Div(
     dash.dependencies.Output('bar1', 'figure'),
     dash.dependencies.Output('bar2', 'figure')],
     [dash.dependencies.Input('date-picker-single', 'date'),
-     dash.dependencies.Input('metric_1', 'value')])
-def update_figure(selected_date, selected_metric):
+     dash.dependencies.Input('metric_1', 'value'),
+     dash.dependencies.Input('metric_2', 'value')])
+def update_figure(selected_date, selected_metric, selected_metric_2):
 
     date = dt.strptime(re.split('T| ', selected_date)[0], '%Y-%m-%d')
     date_string = date.strftime('%Y-%m-%d')
     metric_name = metricName(int(selected_metric))
+    metric_name_2 = metricName(int(selected_metric_2))
 
     if(metric_name == 'Medical staff saturation'):
         color_continuous_scale=[(0, "rgb(223, 30, 38)"), (0.02, "rgb(243, 114, 32)"),
@@ -290,7 +291,13 @@ def update_figure(selected_date, selected_metric):
 
     fig = px.choropleth(data_dict[metric_name], geojson=counties, color=date_string,
                     featureidkey="properties.code", locations="dep",
-                    projection="mercator", hover_name="dep", hover_data={"dep":False, date_string:True},
+                    projection="mercator", hover_name="dep",
+                    hover_data={
+                                "dep":False,
+                                date_string:False,
+                                metric_name:(':.2f', data_dict[metric_name][date_string]),
+                                metric_name_2:(':.2f', data_dict[metric_name_2][date_string])
+                                },
                     color_continuous_scale=color_continuous_scale
                    )
 
@@ -382,6 +389,7 @@ def update_trendline(selected_metric, selected_department):
                     title='Trend line')
 
     return fig_trend
+
 
 if __name__ == '__main__':
     app.run_server(debug=True)
