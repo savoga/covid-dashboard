@@ -34,10 +34,17 @@ for name, sheet in sheets_dict.items():
     metrics_dropdown.append({'label':name, 'value':i})
     i+=1
 
+# this drop down is for the labels , it contains names of the departments
+dep_dropdown2 = []
+dep_list = data_dict[list(data_dict.keys())[0]]['dep']
+for i, dep in enumerate(dep_list):
+    dep_dropdown2.append({'label':dep, 'value': i})
+
+# this drop down is for the trendline , it contains department's code
 dep_dropdown = []
 dep_list = data_dict[list(data_dict.keys())[0]]['dep']
 for i, dep in enumerate(dep_list):
-    dep_dropdown.append({'label':dep, 'value': i})
+    dep_dropdown.append({'label':dict_depart[dep], 'value': i})
 
 first_DF = data_dict[next(iter(data_dict))]
 
@@ -58,11 +65,14 @@ def metricName(value):
             return metric['label']
     return None
 
+
 def departmentNumber(value):
-    for dep in dep_dropdown:
+    for dep in dep_dropdown2:
         if(value == dep['value']):
             return dep['label']
     return None
+
+
 
 # ----------- TRENDLINE -----------
 
@@ -85,7 +95,7 @@ Y0=list(first_DF['dep'].values)
 indices1=Top_indices(X0,10)
 
 X=[int(X0[i]) for i in indices1]
-Y=[dict_depart[Y0[i]]+" ("+Y0[i]+")" for i in indices1]
+Y=[dict_depart[Y0[i]] for i in indices1]
 
 fig_bar1 = go.Figure()
 fig_bar1.add_trace(go.Bar(x=X,y=Y,
@@ -121,7 +131,7 @@ fig_bar1.update_layout(
 
 indices2=lowest_indices(X0,10)
 X=[int(X0[i]) for i in indices2]
-Y=[dict_depart[Y0[i]]+" ("+Y0[i]+")" for i in indices2]
+Y=[dict_depart[Y0[i]] for i in indices2]
 
 fig_bar2 = go.Figure()
 fig_bar2.add_trace(go.Bar(x=X,
@@ -224,7 +234,7 @@ app.layout = html.Div(
                         style={
                             'width': '250px',
                             },
-                        value=1
+                        value=0
                         )
                         ])
                     ], className="three columns")
@@ -311,7 +321,7 @@ def update_figure(selected_date, selected_metric, selected_metric_2):
     ## garder les 10 premieres valeures
     indices1=Top_indices(X0,10)
     X=[int(X0[i]) for i in indices1]
-    Y=[dict_depart[Y0[i]]+" ("+Y0[i]+")" for i in indices1]
+    Y=[dict_depart[Y0[i]] for i in indices1]
 
     fig_bar1 = go.Figure()
     fig_bar1.add_trace(go.Bar(x=X,y=Y,
@@ -322,8 +332,6 @@ def update_figure(selected_date, selected_metric, selected_metric_2):
     fig_bar1.update_layout(
         title='Saturation',
         barmode='stack',
-        #plot_bgcolor="#1e1e1e",
-        #paper_bgcolor="#1e1e1e",
         xaxis={'categoryorder':'total descending'},
         yaxis=dict(
             autorange="reversed",
@@ -345,7 +353,7 @@ def update_figure(selected_date, selected_metric, selected_metric_2):
     ## garder les 10 dernières valeures
     indices2=lowest_indices(X0,10)
     X=[int(X0[i]) for i in indices2]
-    Y=[dict_depart[Y0[i]]+" ("+Y0[i]+")" for i in indices2]
+    Y=[dict_depart[Y0[i]] for i in indices2]
 
     fig_bar2 = go.Figure()
     fig_bar2.add_trace(go.Bar(x=X,
@@ -356,10 +364,7 @@ def update_figure(selected_date, selected_metric, selected_metric_2):
                     ))
     fig_bar2.update_layout(
         title='Avaibility',
-        #barmode='stack',
         xaxis={'categoryorder':'total descending'},
-        #plot_bgcolor='#1e1e1e',
-        #paper_bgcolor='#1e1e1e',
         yaxis=dict(
             autorange="reversed",
             titlefont_size=16,
@@ -368,8 +373,6 @@ def update_figure(selected_date, selected_metric, selected_metric_2):
         legend=dict(
             x=0,
             y=1.0,
-            #bgcolor='rgba(255, 255, 255, 0)',
-            #bordercolor='rgba(255, 255, 255, 0)'
         ),
         bargap=0.05, # gap between bars of adjacent location coordinates.
         bargroupgap=0.05 # gap between bars of the same location coordinate.
@@ -384,12 +387,48 @@ def update_figure(selected_date, selected_metric, selected_metric_2):
 def update_trendline(selected_metric, selected_department):
     metric_name = metricName(int(selected_metric))
     department_name = departmentNumber(selected_department)
-    fig_trend = px.line(data_dict[metric_name], x=data_dict[metric_name].columns[1:],
-                    y=data_dict[metric_name][data_dict[metric_name]['dep']==department_name].values.flat[1:],
-                    title='Trend line')
+
+    # Create figure
+    fig_trend = go.Figure()
+
+    fig_trend.add_trace(go.Scatter( x=data_dict[metric_name].columns[1:],
+                        y=data_dict[metric_name][data_dict[metric_name]['dep']==department_name].values.flat[1:]))
+    # Set title
+    fig_trend.update_layout(
+        title_text="Time series with range slider and selectors"
+    )
+    # Add range slider
+    fig_trend.update_layout(
+        xaxis=dict(
+            rangeselector=dict(
+                buttons=list([
+
+                     dict(count=1,
+                        label="day",
+                        step="day",
+                        stepmode="backward"),
+                     dict(count=7,
+                      label="week",
+                      step="day",
+                      stepmode="backward"),
+                      dict(count=1,
+                       label="1m",
+                       step="month",
+                       stepmode="backward"),
+                    dict(step="all")
+                ])
+            ),
+            rangeslider=dict(
+                visible=True
+            ),
+            type="date"
+        )
+    )
 
     return fig_trend
 
 
+
+
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(port=8053,debug=True)
