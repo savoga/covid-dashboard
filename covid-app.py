@@ -319,7 +319,11 @@ def update_figure(selected_date, selected_metric, selected_metric_2):
     Y0=list(data_dict[metric_name]['dep'].values)
 
     ## garder les 10 premieres valeures
-    indices1=Top_indices(X0,10)
+    if(metric_name == 'Medical staff saturation'):
+        indices1=lowest_indices(X0,10)
+    else:
+        indices1=Top_indices(X0,10)
+
     X=[int(X0[i]) for i in indices1]
     Y=[dict_depart[Y0[i]] for i in indices1]
 
@@ -351,7 +355,10 @@ def update_figure(selected_date, selected_metric, selected_metric_2):
     #####-----------------------update of chart bar 2----------------------
 
     ## garder les 10 dernières valeures
-    indices2=lowest_indices(X0,10)
+    if(metric_name == 'Medical staff saturation'):
+        indices2=Top_indices(X0,10)
+    else:
+        indices2=lowest_indices(X0,10)
     X=[int(X0[i]) for i in indices2]
     Y=[dict_depart[Y0[i]] for i in indices2]
 
