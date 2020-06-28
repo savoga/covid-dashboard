@@ -4,9 +4,7 @@
 
 ### Introduction
 
-This project is part of a university course named Information Vizualization attended at Télécom Paris. The dash board is live at the following link:
-
-https://covid-hospital-tracker.herokuapp.com/
+This project is part of a university course named Information Vizualization attended at Télécom Paris. The dash board is live at the following link: https://covid-hospital-tracker.herokuapp.com/
 
 ### Context
 
