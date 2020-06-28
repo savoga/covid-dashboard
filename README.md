@@ -6,6 +6,8 @@
 
 This project is part of a university course named Information Vizualization attended at Télécom Paris.
 
+The Covid-19 global pandemic had a major impact on several public services in France, particularly hospitals. Multiple Covid-19 dashboards were created, but none of them showed the situation of hospitals during the influx of patients. Many hospitals faced saturation of beds and medical staff due to the large number of hospitalizations and intensive care required. The Covid-19 hospital tracker is a dashboard built to visualize in particular the situation of **hospitals** in each department of France.
+
 ### Metrics
 
 <img src="https://github.com/savoga/covid-dashboard/blob/master/img/hosp_rate.png"></img>
