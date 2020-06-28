@@ -12,6 +12,7 @@ import re
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
 
 with urlopen('https://france-geojson.gregoiredavid.fr/repo/departements.geojson') as response:
     counties = json.load(response) # load map in json format
