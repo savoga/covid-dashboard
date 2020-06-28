@@ -4,7 +4,12 @@
 
 ### Introduction
 
-This projet is a university project taking part of a Information Vizualization course.
+This project is part of a university course named Information Vizualization attended at Télécom Paris.
 
 ### Metrics
 
+<img src="https://github.com/savoga/covid-dashboard/blob/master/img/hosp_rate.png"></img>
+
+<img src="https://github.com/savoga/covid-dashboard/blob/master/img/hosp_rate_int_care.png "></img>
+
+<img src="https://github.com/savoga/covid-dashboard/blob/master/img/medical_staff_saturation.png"></img>
