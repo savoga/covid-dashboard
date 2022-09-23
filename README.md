@@ -4,7 +4,7 @@
 
 ### Introduction
 
-This project is part of a university course named Information Vizualization attended at Télécom Paris. The dashboard is live at the following link: https://covid-hospital-tracker.herokuapp.com/. **Warning**: some libraries might be outdated. Since this project is not maintained, the link may not work correctly.
+This project is part of a university course named Information Vizualization attended at Télécom Paris. The dashboard is live at the following link: https://covid-hospital-tracker.herokuapp.com/ (**WARNING**: some libraries might be outdated. Since this project is not maintained, the link may not work correctly).
 
 ### Context
 
